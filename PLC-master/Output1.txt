@@ -1,0 +1,77 @@
+import util!
+import io!
+public class purpleGiraffes {
+    public void main(String args[]){
+        int num1 :: 5!
+        int num2 :: 10!
+        int sum :: num1 + num2!
+        int total :: 70!
+
+        (sum+47) / total!
+    }
+}
+import | 62
+util | 11
+! | 51
+EOL | -2
+import | 62
+io | 11
+! | 51
+EOL | -2
+public | 107
+class | 95
+purpleGiraffes | 11
+{ | 50
+EOL | -2
+public | 107
+void | 89
+main | 11
+( | 41
+String | 108
+args | 11
+[ | 43
+] | 44
+) | 42
+{ | 50
+EOL | -2
+int | 99
+num1 | 11
+:: | 20
+5 | 10
+! | 51
+EOL | -2
+int | 99
+num2 | 11
+:: | 20
+10 | 10
+! | 51
+EOL | -2
+int | 99
+sum | 11
+:: | 20
+num1 | 11
++ | 21
+num2 | 11
+! | 51
+EOL | -2
+int | 99
+total | 11
+:: | 20
+70 | 10
+! | 51
+EOL | -2
+EOL | -2
+( | 41
+sum | 11
++ | 21
+47 | 10
+) | 42
+/ | 24
+total | 11
+! | 51
+EOL | -2
+} | 49
+EOL | -2
+} | 49
+EOL | -2
+EOF | -1
