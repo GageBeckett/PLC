@@ -1,4 +1,5 @@
 package com.company;
+
 import java.util.*;
 import java.io.*;
 
@@ -8,7 +9,7 @@ public class LexicalAnalyzer {
     public static final int DIGIT = 1;
     public static final int EOF = -1;
     public static final int EOL = -2;
-    public static final int UNKNOWN = 99;
+    public static final int UNKNOWN = -3;
 
     // token codes
     public static final int INT_LIT = 10;
@@ -16,6 +17,8 @@ public class LexicalAnalyzer {
     public static final int COMMENT = 12;
     public static final int FLOAT_LIT = 13;
     public static final int STRING_LIT = 14;
+    public static final int UTIL_PACKAGE = 15;
+    public static final int IO_PACKAGE = 16;
     public static final int CHAR_LIT = 17;
 
     public static final int ASSIGN_OP = 20;
@@ -49,8 +52,6 @@ public class LexicalAnalyzer {
     public static final int DOT_SYM = 56;
     public static final int DOUBLE_QUOTE = 57;
     public static final int SINGLE_QUOTE = 58;
-    public static final int LESS_ANG = 59;
-    public static final int GREAT_ANG = 60;
 
     public static final int FOR_CODE = 61;
     public static final int IMPORT_CODE = 62;
@@ -74,6 +75,7 @@ public class LexicalAnalyzer {
     public static final int RETURN_CODE = 80;
     public static final int INTERFACE_CODE = 81;
 
+    public static final int PRINT_CODE = 82;
     public static final int THIS_CODE = 83;
     public static final int THROW_CODE = 84;
     public static final int THROWS_CODE = 85;
@@ -104,21 +106,23 @@ public class LexicalAnalyzer {
     public static final int PUBLIC_CLASS = 107;
     public static final int SUPER_CLASS = 108;
     public static final int ABSTRACT_CLASS = 109;
+    public static final int TYPE_DEFINE = 110;
+
 
     // parallel arrays to speed up the process of looking for errors
     public String[] keywords = {"abstract","boo","break","byte","case","catch","char","class",
             "constant","continue","default","do","double","else","extends","const","finally","float",
             "for","goto","if","implements","import","instanceof","int","interface","long","native","new","package",
             "private","protected","public","return","short","static","String","super","switch","synchronized","this","throw",
-            "throws", "transient","try","void","volatile","while"};
+            "throws", "transient","try","void","volatile","while","System.out.println", "java.util.", "java.io.", };
 
     public int[] keywordsTokens = {ABSTRACT_CLASS, BOOLEAN_TYPE, BREAK_CODE, BYTE_TYPE, CASE_CODE, CATCH_CODE,
             CHAR_TYPE, CLASS_TYPE, CONSTANT_TYPE, CONTINUE_CODE, DEFAULT_CODE, DO_CODE, DOUBLE_TYPE, ELSE_CODE,
             EXTENDS_CODE, CONST_TYPE, FINALLY_TYPE, FLOAT_TYPE, FOR_CODE, GOTO_CODE, IF_CODE, IMPLEMENTS_CODE,
             IMPORT_CODE, INSTANCEOF_CODE,INT_TYPE, INTERFACE_CODE, LONG_TYPE, NATIVE_CODE, NEW_CODE, PACKAGE_CODE, PRIVATE_CLASS,
-            PROTECTED_CLASS, PUBLIC_CLASS, RETURN_CODE, SHORT_TYPE, STATIC_TYPE, SUPER_CLASS, SWITCH_CODE, SYNCHRONIZED_CODE,
+            PROTECTED_CLASS, PUBLIC_CLASS, RETURN_CODE, SHORT_TYPE, STATIC_TYPE, STRING_TYPE, SUPER_CLASS, SWITCH_CODE, SYNCHRONIZED_CODE,
             THIS_CODE, THROW_CODE, THROWS_CODE, TRANSIENT_CODE, TRY_CODE, VOID_CODE, VOLATILE_CODE, WHILE_CODE,
-            STRING_TYPE};
+            PRINT_CODE, UTIL_PACKAGE, IO_PACKAGE};
 
     public String[] relationalOperators = {"=","<::",">::","!=","<=",">="};
     public int[] relationalTokens = {EQUALS_OP, LESS_SYM, GREATER_SYM, NOTEQUALS_OP, LESSEQUALS_OP,
@@ -129,7 +133,7 @@ public class LexicalAnalyzer {
 
     //all the typical mathematical assignments as well +:: *:: etc
     public String[] assignmentOperators = {"::"};
-    public int[] assignmentTokens = {ASSIGN_OP};
+    public int[] assignmentTokens = { ASSIGN_OP};
 
     public String[] comparisonOperators = {"and","or","not"};
     public int[] comparisonTokens = {AND_OP, OR_OP, NOT_OP};
@@ -193,15 +197,6 @@ public class LexicalAnalyzer {
     // check if character is the start of a comment
     public boolean isCommentStart(char ch) {
         if(ch == '/') {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // check if character is the start of a statement---------------------------------------------------------
-    public boolean isStatementStart(char ch) {
-        if(ch == '@') {
             return true;
         } else {
             return false;
@@ -347,8 +342,6 @@ public class LexicalAnalyzer {
             buildLexeme(otherSymbols, otherTokens);
         } else if(isVariableTypeStart(ch)) {
             buildLexeme(assignmentOperators, assignmentTokens);
-        }else if(isStatementStart(ch)) {
-            buildStatement();
         }else {  // check arrays for character
             if(Arrays.asList(mathematicalOperators).indexOf(character) != -1) {
                 key = Arrays.asList(mathematicalOperators).indexOf(character);
@@ -379,7 +372,7 @@ public class LexicalAnalyzer {
 
     // add nextChar to lexeme
     public void addChar() {
-        if (lexLen <= 106) {
+        if (lexLen <= 110) {
             lexeme[lexLen++] = nextChar;
             lexeme[lexLen] = 0;
         }
@@ -431,7 +424,7 @@ public class LexicalAnalyzer {
             case LETTER:
                 addChar();
                 getChar();
-                while (charClass == LETTER || charClass == DIGIT) {
+                while (charClass == LETTER || charClass == DIGIT || charClass == DOT_SYM) {
                     addChar();
                     getChar();
                 }
@@ -534,14 +527,14 @@ public class LexicalAnalyzer {
         ArrayList<String> lexemeArray = new ArrayList<String>();
 
         // open the input data file and process its contents
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\gbeckett\\Downloads\\LexicalAnalyzer\\PurpleGiraffes.pg")))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("PurpleGiraffes.pg")))) {
             String line;
             int i = 0;
             while((line = reader.readLine()) != null && !error) {
                 lineCount++;
                 LexicalAnalyzer analyze = new LexicalAnalyzer();
                 char[] characters = line.toCharArray();  // convert string to character array
-                System.out.println(line);
+                /*System.out.println(line);*/
                 analyze.setCharacters(characters);
                 analyze.getChar();
 
@@ -567,12 +560,45 @@ public class LexicalAnalyzer {
             } else {  // parse program
                 tokenArray.add(-1);
                 lexemeArray.add("EOF");
+
+                parseProgram(tokenArray, lexemeArray);
                 for(i = 0; i < lexemeArray.size(); i++){
                    System.out.print(lexemeArray.get(i) + " | ");
                     System.out.print(tokenArray.get(i));
                     System.out.println();
                 }
 
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR - cannot open file");
+        }
+    }
+    public static void parseProgram(ArrayList<Integer> tokenArray, ArrayList<String> lexemeArray) {
+        try{
+            PrintWriter writer = new PrintWriter("Test.java", "UTF-8");
+            RecursiveParser parser = new RecursiveParser(tokenArray, lexemeArray, writer);
+
+            parser.parsePackages();  // parse the program
+
+            // if syntax error, write over file to simply print an error message
+            if(parser.getError()) {
+                writer.close();
+
+                try {
+                    PrintWriter error = new PrintWriter("Test.java", "UTF-8");
+                    error.println("import java.util.*;");
+                    error.println("import java.io.*;");
+                    error.println("public class Test\r\n{");
+                    error.println("public static void main(String[] args)\r\n{");
+                    error.println("System.out.println(\"Error generating file.\");");
+                    error.println("}\r\n}");
+                    error.close();
+                } catch(IOException e) {
+                    System.out.println("ERROR - cannot open file");
+                }
+            } else { // no errors found
+                System.out.println("FINISHED - No errors found");
+                writer.close();
             }
         } catch (IOException e) {
             System.out.println("ERROR - cannot open file");

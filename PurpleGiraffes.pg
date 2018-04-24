@@ -1,12 +1,12 @@
-import util!
-import io!
+import java.util.!
+import java.io.!
 public class purpleGiraffes {
-    public void main(String args[]){
+    public static void main(String args[]){
         int num1 :: 5!
         int num2 :: 10!
         int sum :: num1 + num2!
         int total :: 70!
-        String output :: "The total is: !
-        (sum+47) / total!
+        String output :: "The total is: "!
+        System.out.println(sum+47 / total)!
     }
 }
